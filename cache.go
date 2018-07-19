@@ -14,8 +14,7 @@ limitations under the License.
 package vegamcache
 
 import (
-	"bytes"
-	"encoding/gob"
+	"encoding/json"
 	"sync"
 	"time"
 
@@ -63,11 +62,11 @@ func (ec *externalCache) Put(key string, val interface{}, ttl time.Duration) {
 func (c *cache) Encode() [][]byte {
 	c.Lock()
 	defer c.Unlock()
-	var buf bytes.Buffer
-	if err := gob.NewEncoder(&buf).Encode(c.set); err != nil {
+	buf, err := json.Marshal(c.set)
+	if err != nil {
 		panic(err)
 	}
-	return [][]byte{buf.Bytes()}
+	return [][]byte{buf}
 }
 
 func (c *cache) Merge(other mesh.GossipData) mesh.GossipData {
@@ -98,6 +97,8 @@ func (c *cache) mergeComplete(other map[string]Value) mesh.GossipData {
 }
 
 func (c *cache) mergeDelta(set map[string]Value) (delta mesh.GossipData) {
+	c.Lock()
+	defer c.Unlock()
 	for k, v := range set {
 		val, ok := c.set[k]
 		if ok && val.LastWrite > v.LastWrite {
@@ -115,6 +116,8 @@ func (c *cache) mergeDelta(set map[string]Value) (delta mesh.GossipData) {
 }
 
 func (c *cache) mergeRecived(set map[string]Value) (recived mesh.GossipData) {
+	c.Lock()
+	c.Unlock()
 	for k, v := range set {
 		val, ok := c.set[k]
 		if ok && val.LastWrite > v.LastWrite {

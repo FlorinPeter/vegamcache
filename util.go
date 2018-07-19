@@ -14,8 +14,7 @@ limitations under the License.
 package vegamcache
 
 import (
-	"bytes"
-	"encoding/gob"
+	"encoding/json"
 	"net"
 )
 
@@ -34,7 +33,7 @@ func mustHardwareAddr() string {
 
 func decodeSet(buf []byte) (map[string]Value, error) {
 	var set map[string]Value
-	if err := gob.NewDecoder(bytes.NewReader(buf)).Decode(&set); err != nil {
+	if err := json.Unmarshal(buf, &set); err != nil {
 		return nil, err
 	}
 	return set, nil
