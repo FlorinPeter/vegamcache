@@ -1,5 +1,5 @@
 /*
-Copyright 2018 The vegamcache Authors.
+Copyright 2018 The Vegamcache Authors.
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
@@ -11,7 +11,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package vegamcache
+package Vegamcache
 
 import (
 	"net"
@@ -20,7 +20,7 @@ import (
 	"github.com/weaveworks/mesh"
 )
 
-type vegam struct {
+type Vegam struct {
 	gossip  mesh.Gossip
 	peer    *peer
 	router  *mesh.Router
@@ -29,7 +29,7 @@ type vegam struct {
 	stop    chan int
 }
 
-func NewVegam(vc *VegamConfig) (*vegam, error) {
+func NewVegam(vc *VegamConfig) (*Vegam, error) {
 	initConfig(vc)
 	peername, err := mesh.PeerNameFromString(vc.PeerName)
 	if err != nil {
@@ -61,7 +61,7 @@ func NewVegam(vc *VegamConfig) (*vegam, error) {
 	if err != nil {
 		return nil, err
 	}
-	return &vegam{
+	return &Vegam{
 		gossip: gossip,
 		peer:   peer,
 		router: router,
@@ -70,7 +70,7 @@ func NewVegam(vc *VegamConfig) (*vegam, error) {
 	}, nil
 }
 
-func (v *vegam) Start() {
+func (v *Vegam) Start() {
 	actions := make(chan func())
 	v.actions = actions
 	v.router.Start()
@@ -78,7 +78,7 @@ func (v *vegam) Start() {
 	go v.loop(actions)
 }
 
-func (v *vegam) loop(actions <-chan func()) {
+func (v *Vegam) loop(actions <-chan func()) {
 	for {
 		select {
 		case f := <-actions:
@@ -89,17 +89,17 @@ func (v *vegam) loop(actions <-chan func()) {
 	}
 }
 
-func (v *vegam) Stop() {
+func (v *Vegam) Stop() {
 	v.stop <- 1
 	v.router.Stop()
 }
 
-func (v *vegam) Get(key string) (val interface{}, exist bool) {
+func (v *Vegam) Get(key string) (val interface{}, exist bool) {
 	val, exist = v.peer.cache.get(key)
 	return
 }
 
-func (v *vegam) Put(key string, val interface{}, expiry time.Duration) {
+func (v *Vegam) Put(key string, val interface{}, expiry time.Duration) {
 	var expiryTime int64
 	if expiry == 0 {
 		expiryTime = 0
