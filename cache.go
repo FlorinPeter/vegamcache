@@ -117,7 +117,7 @@ func (c *cache) mergeDelta(set map[string]Value) (delta mesh.GossipData) {
 
 func (c *cache) mergeRecived(set map[string]Value) (recived mesh.GossipData) {
 	c.Lock()
-	c.Unlock()
+	defer c.Unlock()
 	for k, v := range set {
 		val, ok := c.set[k]
 		if ok && val.LastWrite > v.LastWrite {
