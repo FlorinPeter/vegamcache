@@ -27,8 +27,7 @@ type Value struct {
 	Expiry    int64
 }
 type cache struct {
-	sync.Mutex
-	set map[string]Value
+	set sync.Map
 }
 
 var _ mesh.GossipData = &cache{}
@@ -38,9 +37,7 @@ type externalCache struct {
 }
 
 func NewCache() *externalCache {
-	return &externalCache{&cache{
-		set: make(map[string]Value),
-	}}
+	return &externalCache{&cache{}}
 }
 
 func (ec *externalCache) Get(key string) (interface{}, bool) {
@@ -60,9 +57,12 @@ func (ec *externalCache) Put(key string, val interface{}, ttl time.Duration) {
 	})
 }
 func (c *cache) Encode() [][]byte {
-	c.Lock()
-	defer c.Unlock()
-	buf, err := json.Marshal(c.set)
+	tmpMap := make(map[string]Value)
+	c.set.Range(func(k, v interface{}) bool {
+		tmpMap[k.(string)] = v.(Value)
+		return true
+	})
+	buf, err := json.Marshal(tmpMap)
 	if err != nil {
 		panic(err)
 	}
@@ -74,22 +74,21 @@ func (c *cache) Merge(other mesh.GossipData) mesh.GossipData {
 }
 
 func (c *cache) mergeComplete(other map[string]Value) mesh.GossipData {
-	c.Lock()
-	defer c.Unlock()
 	for k, v := range other {
-		val, ok := c.set[k]
+		val, ok := c.set.Load(k)
 		if !ok {
 			if v.Expiry < time.Now().UnixNano() {
 				continue
 			}
-			c.set[k] = v
+			c.set.Store(k, v)
+			continue
 		}
 		// checking existing expiry
-		if val.Expiry < time.Now().UnixNano() {
-			delete(c.set, k)
+		if val.(Value).Expiry < time.Now().UnixNano() {
+			c.set.Delete(k)
 		}
-		if val.LastWrite < v.LastWrite {
-			c.set[k] = v
+		if val.(Value).LastWrite < v.LastWrite {
+		     c.set.Store(k, v)
 			continue
 		}
 	}
@@ -97,67 +96,65 @@ func (c *cache) mergeComplete(other map[string]Value) mesh.GossipData {
 }
 
 func (c *cache) mergeDelta(set map[string]Value) (delta mesh.GossipData) {
-	c.Lock()
-	defer c.Unlock()
 	for k, v := range set {
-		val, ok := c.set[k]
-		if ok && val.LastWrite > v.LastWrite {
-			delete(set, k)
+		val, ok := c.set.Load(k)
+		if ok && val.(Value).LastWrite > v.LastWrite {
+			c.set.Delete(k)
 			continue
 		}
 		// expired value is not added
-		if val.Expiry != 0 && val.Expiry < time.Now().UnixNano() {
-			delete(set, k)
+		if val.(Value).Expiry != 0 && val.(Value).Expiry < time.Now().UnixNano() {
+			c.set.Delete(k)
 			continue
 		}
-		c.set[k] = v
+		c.set.Store(k, v)
 	}
-	return &cache{set: set}
+	
+	// TODO check
+	//return &cache{set: set}
+	return &cache{}
 }
 
 func (c *cache) mergeRecived(set map[string]Value) (recived mesh.GossipData) {
-	c.Lock()
-	defer c.Unlock()
 	for k, v := range set {
-		val, ok := c.set[k]
-		if ok && val.LastWrite > v.LastWrite {
-			delete(set, k)
+		val, ok := c.set.Load(k)
+		if ok && val.(Value)LastWrite > v.LastWrite {
+			c.set.Delete(k)
 			continue
 		}
 		// expired value is not added
-		if val.Expiry != 0 && val.Expiry < time.Now().UnixNano() {
-			delete(set, k)
+		if val.(Value).Expiry != 0 && val.(Value).Expiry < time.Now().UnixNano() {
+			c.set.Delete(k)
 			continue
 		}
-		c.set[k] = v
+		c.set.Store(k, v)
 	}
 	if len(set) == 0 {
 		return nil
 	}
-	return &cache{set: set}
+	
+	// TODO check
+	//return &cache{set: set}
+	return &cache{}
 }
 
-func (c *cache) copy() *cache {
+/*func (c *cache) copy() *cache {
 	return &cache{
 		set: c.set,
 	}
-}
+}*/
 
 func (c *cache) get(key string) (interface{}, bool) {
-	c.Lock()
-	defer c.Unlock()
-	if val, ok := c.set[key]; ok {
-		if val.Expiry == 0 || val.Expiry > time.Now().UnixNano() {
-			return val.Data, true
+	if val, ok := c.set.Load(key); ok {
+		if val.(Value).Expiry == 0 || val.(Value).Expiry > time.Now().UnixNano() {
+			return val.(Value).Data, true
 		}
-		delete(c.set, key)
+		c.set.Delete(key)
 		return nil, false
 	}
 	return nil, false
 }
 
 func (c *cache) put(key string, val Value) {
-	c.Lock()
-	defer c.Unlock()
-	c.set[key] = val
+	c.set.Store(key, val)
 }

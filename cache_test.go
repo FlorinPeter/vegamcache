@@ -19,9 +19,7 @@ import (
 )
 
 func TestCache(t *testing.T) {
-	c := &cache{
-		set: make(map[string]Value),
-	}
+	c := &cache{}
 	c.put("foo", Value{
 		Data:      "bar",
 		Expiry:    time.Now().Add(5 * time.Second).UnixNano(),
@@ -34,9 +32,7 @@ func TestCache(t *testing.T) {
 }
 
 func TestExpiry(t *testing.T) {
-	c := &cache{
-		set: make(map[string]Value),
-	}
+	c := &cache{}
 	c.put("foo", Value{
 		Data:      "bar",
 		Expiry:    time.Now().Add(5 * time.Second).UnixNano(),
@@ -50,9 +46,7 @@ func TestExpiry(t *testing.T) {
 }
 
 func TestMerges(t *testing.T) {
-	c := &cache{
-		set: make(map[string]Value),
-	}
+	c := &cache{}
 	c.put("foo", Value{
 		Data:      "bar",
 		Expiry:    time.Now().Add(5 * time.Second).UnixNano(),
@@ -63,7 +57,7 @@ func TestMerges(t *testing.T) {
 		t.Fatalf("merge complete has to give the entire data")
 	}
 	for _, val := range []string{"foo", "bar"} {
-		_, ok := completedData.(*cache).set[val]
+		_, ok := completedData.(*cache).set.Load(val)
 		if !ok {
 			t.Fatalf("%s not exist in set", val)
 		}
