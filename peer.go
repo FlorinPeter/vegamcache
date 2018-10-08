@@ -24,7 +24,7 @@ type peer struct {
 var _ mesh.Gossiper = &peer{}
 
 func (p *peer) Gossip() (complete mesh.GossipData) {
-	return p.cache.copy()
+	return p.cache
 }
 
 func (p *peer) OnGossip(buf []byte) (delta mesh.GossipData, err error) {

@@ -70,7 +70,12 @@ func (c *cache) Encode() [][]byte {
 }
 
 func (c *cache) Merge(other mesh.GossipData) mesh.GossipData {
-	return c.mergeComplete(other.(*cache).copy().set)
+     tmpMap := make(map[string]Value)
+	other(*cache).set.Range(func(k, v interface{}) bool {
+		tmpMap[k.(string)] = v.(Value)
+		return true
+	})
+	return c.mergeComplete(tmpMap)
 }
 
 func (c *cache) mergeComplete(other map[string]Value) mesh.GossipData {
