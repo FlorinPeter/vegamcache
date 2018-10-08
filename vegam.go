@@ -53,9 +53,7 @@ func NewVegam(vc *VegamConfig) (*Vegam, error) {
 		return nil, err
 	}
 	peer := &peer{
-		cache: &cache{
-			set: make(map[string]Value),
-		},
+		cache: &cache{},
 	}
 	gossip, err := router.NewGossip(vc.Channel, peer)
 	if err != nil {
@@ -112,10 +110,9 @@ func (v *Vegam) Put(key string, val interface{}, expiry time.Duration) {
 		Expiry:    expiryTime,
 	}
 	v.peer.cache.put(key, tempVal)
-	tempCache := &cache{
-		set: make(map[string]Value),
-	}
-	tempCache.set[key] = tempVal
+	
+	tempCache := make(map[string]Value)
+	tempCache[key] = tempVal
 	v.actions <- func() {
 		v.gossip.GossipBroadcast(tempCache)
 	}
