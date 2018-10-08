@@ -16,6 +16,7 @@ package vegamcache
 import (
 	"testing"
 	"time"
+	"log"
 )
 
 func TestCache(t *testing.T) {
@@ -52,8 +53,9 @@ func TestMerges(t *testing.T) {
 		Expiry:    time.Now().Add(5 * time.Second).UnixNano(),
 		LastWrite: time.Now().UnixNano(),
 	})
-	//completedData := c.mergeComplete(map[string]Value{"bar": Value{Data: "foo"}})
+	completedData := c.mergeComplete(map[string]Value{"bar": Value{Data: "foo"}})
 	
+	log.Print(completedData)
 	/*
 	if len(completedData.(*cache).set) != 2 {
 		t.Fatalf("merge complete has to give the entire data")
