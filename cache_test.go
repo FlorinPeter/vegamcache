@@ -53,7 +53,7 @@ func TestMerges(t *testing.T) {
 		Expiry:    time.Now().Add(5 * time.Second).UnixNano(),
 		LastWrite: time.Now().UnixNano(),
 	})
-	completedData := c.mergeComplete(map[string]Value{"bar": Value{Data: "foo"}})
+	completedData := c.mergeComplete(map[string]Value{"bar": Value{Data: "foo", Expiry: time.Now().Add(5 * time.Second).UnixNano(}})
 	
 	log.Print(completedData)
 	/*
