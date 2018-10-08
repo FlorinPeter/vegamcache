@@ -71,7 +71,7 @@ func (c *cache) Encode() [][]byte {
 
 func (c *cache) Merge(other mesh.GossipData) mesh.GossipData {
      tmpMap := make(map[string]Value)
-	other(*cache).set.Range(func(k, v interface{}) bool {
+	other.(*cache).set.Range(func(k, v interface{}) bool {
 		tmpMap[k.(string)] = v.(Value)
 		return true
 	})
