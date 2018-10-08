@@ -111,8 +111,8 @@ func (v *Vegam) Put(key string, val interface{}, expiry time.Duration) {
 	}
 	v.peer.cache.put(key, tempVal)
 	
-	tempCache := make(map[string]Value)
-	tempCache[key] = tempVal
+	tempCache := &cache{}
+	tempCache.set.Store(key, tempVal)
 	v.actions <- func() {
 		v.gossip.GossipBroadcast(tempCache)
 	}
