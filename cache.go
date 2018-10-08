@@ -118,7 +118,7 @@ func (c *cache) mergeDelta(set map[string]Value) (delta mesh.GossipData) {
 func (c *cache) mergeRecived(set map[string]Value) (recived mesh.GossipData) {
 	for k, v := range set {
 		val, ok := c.set.Load(k)
-		if ok && val.(Value)LastWrite > v.LastWrite {
+		if ok && val.(Value).LastWrite > v.LastWrite {
 			c.set.Delete(k)
 			continue
 		}
