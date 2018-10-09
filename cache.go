@@ -108,7 +108,7 @@ func (c *cache) mergeDelta(set map[string]Value) (delta mesh.GossipData) {
 			continue
 		}
 		// expired value is not added
-		if val.(Value).Expiry != 0 && val.(Value).Expiry < time.Now().UnixNano() {
+		if ok && val.(Value).Expiry != 0 && val.(Value).Expiry < time.Now().UnixNano() {
 			c.set.Delete(k)
 			continue
 		}
@@ -128,7 +128,7 @@ func (c *cache) mergeRecived(set map[string]Value) (recived mesh.GossipData) {
 			continue
 		}
 		// expired value is not added
-		if val.(Value).Expiry != 0 && val.(Value).Expiry < time.Now().UnixNano() {
+		if ok && val.(Value).Expiry != 0 && val.(Value).Expiry < time.Now().UnixNano() {
 			c.set.Delete(k)
 			continue
 		}
