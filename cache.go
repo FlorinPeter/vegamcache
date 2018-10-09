@@ -117,7 +117,7 @@ func (c *cache) mergeDelta(set map[string]Value) (delta mesh.GossipData) {
 	
 	// TODO check
 	//return &cache{set: set}
-	return &cache{}
+	return c
 }
 
 func (c *cache) mergeRecived(set map[string]Value) (recived mesh.GossipData) {
@@ -140,7 +140,7 @@ func (c *cache) mergeRecived(set map[string]Value) (recived mesh.GossipData) {
 	
 	// TODO check
 	//return &cache{set: set}
-	return &cache{}
+	return c
 }
 
 /*func (c *cache) copy() *cache {
