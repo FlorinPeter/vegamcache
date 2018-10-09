@@ -59,7 +59,8 @@ func TestMerges(t *testing.T) {
 	/*
 	if len(completedData.(*cache).set) != 2 {
 		t.Fatalf("merge complete has to give the entire data")
-	}
+	}*/
+	
 	for _, val := range []string{"foo", "bar"} {
 		_, ok := completedData.(*cache).set.Load(val)
 		if !ok {
@@ -67,11 +68,11 @@ func TestMerges(t *testing.T) {
 		}
 	}
 	recivedData := c.mergeRecived(map[string]Value{"bar": Value{Data: "foo"}})
-	if len(recivedData.(*cache).set) != 1 {
+	/*if len(recivedData.(*cache).set) != 1 {
 		t.Fatalf("merge recived has to reture only recived data")
-	}
+	}*/
 	_, ok := recivedData.(*cache).set["bar"]
 	if !ok {
 		t.Fatal("bar not exist in set")
-	}*/
+	}
 }
