@@ -43,7 +43,7 @@ func main() {
 					fmt.Println("value got from another node")
 					ticker.Stop()
 				} else {
-					fmt.Println(val)
+					//fmt.Println(val)
 				}
 			}
 		}()
