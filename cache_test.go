@@ -67,7 +67,7 @@ func TestMerges(t *testing.T) {
 			t.Fatalf("%s not exist in set", val)
 		}
 	}
-	recivedData := c.mergeRecived(map[string]Value{"bar": Value{Data: "foo"}})
+	recivedData := c.mergeRecived(map[string]Value{"bar": Value{Data: "foo", Expiry: time.Now().Add(5 * time.Second).UnixNano()}})
 	/*if len(recivedData.(*cache).set) != 1 {
 		t.Fatalf("merge recived has to reture only recived data")
 	}*/
