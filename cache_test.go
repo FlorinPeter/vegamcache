@@ -71,7 +71,7 @@ func TestMerges(t *testing.T) {
 	/*if len(recivedData.(*cache).set) != 1 {
 		t.Fatalf("merge recived has to reture only recived data")
 	}*/
-	_, ok := recivedData.(*cache).set["bar"]
+	_, ok := recivedData.(*cache).set.Load("bar")
 	if !ok {
 		t.Fatal("bar not exist in set")
 	}
