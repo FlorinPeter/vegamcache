@@ -93,7 +93,8 @@ func (c *cache) mergeComplete(other map[string]Value) mesh.GossipData {
 			continue
 		}
 	}
-	return c
+	
+	return &cache{set: c.set}
 }
 
 func (c *cache) mergeDelta(set map[string]Value) (delta mesh.GossipData) {
@@ -112,6 +113,7 @@ func (c *cache) mergeDelta(set map[string]Value) (delta mesh.GossipData) {
 		}
 		c.set[k] = v
 	}
+	
 	return &cache{set: set}
 }
 
